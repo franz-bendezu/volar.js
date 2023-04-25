@@ -13,7 +13,12 @@
 		"directory": "packages/typescript"
 	},
 	"dependencies": {
-		"@volar/language-core": "1.4.1"
+		"@volar/language-core": "1.4.1",
+		"pretty-ts-errors-lsp": "latest",
+		"prettier": "latest",
+		"html2text": "latest",
+		"marked": "latest",
+		"marked-terminal": "latest"
 	},
 	"peerDependencies": {
 		"typescript": "*"

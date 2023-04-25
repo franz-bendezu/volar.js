@@ -1,5 +1,17 @@
 import type * as ts from 'typescript/lib/tsserverlibrary';
 import type * as embedded from '@volar/language-core';
+import { identSentences } from 'pretty-ts-errors-lsp/out/format/identSentences';
+import { formatDiagnosticMessage } from 'pretty-ts-errors-lsp/out/format/formatDiagnosticMessage';
+import * as prettier from 'prettier';
+
+const { fromString } = require('html2text');
+const { marked } = require('marked');
+const TerminalRenderer = require('marked-terminal');
+const renderer = new TerminalRenderer({
+	html: (html: string) => fromString(html, { wordwrap: 9999 }),
+});
+
+marked.setOptions({ renderer });
 
 export function getProgram(
 	ts: typeof import('typescript/lib/tsserverlibrary'),
@@ -99,6 +111,9 @@ export function getProgram(
 		const result: T[] = [];
 
 		for (const diagnostic of diagnostics) {
+
+			diagnostic.messageText = getMessageText(diagnostic);
+
 			if (
 				diagnostic.file !== undefined
 				&& diagnostic.start !== undefined
@@ -193,4 +208,36 @@ export function getProgram(
 			result.push(newDiagnostic);
 		}
 	}
+}
+
+function getMessageText(diag: ts.Diagnostic | ts.DiagnosticMessageChain, level = 0) {
+	let messageText = '  '.repeat(level);
+
+	if (typeof diag.messageText === 'string') {
+		messageText += format(diag.messageText);
+	}
+	else {
+		messageText += format(diag.messageText.messageText);
+		if (diag.messageText.next) {
+			for (const info of diag.messageText.next) {
+				messageText += '\n' + getMessageText(info, level + 1);
+			}
+		}
+	}
+
+	return messageText;
+}
+
+function format(s: string) {
+	s = identSentences(s);
+	s = formatDiagnosticMessage(s, (text: string) => prettier.format(text, {
+		parser: "typescript",
+		printWidth: 60,
+		singleAttributePerLine: false,
+		arrowParens: "avoid",
+	}));
+	s = `<span>${s}</span>`;
+	s = marked(s);
+	s = s.replace(/\n\n/g, '\n');
+	return s;
 }
