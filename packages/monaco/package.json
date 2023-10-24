@@ -1,6 +1,6 @@
 {
 	"name": "@volar/monaco",
-	"version": "1.10.1",
+	"version": "1.10.4",
 	"main": "out/index.js",
 	"license": "MIT",
 	"files": [
@@ -15,11 +15,11 @@
 		"directory": "packages/monaco"
 	},
 	"dependencies": {
-		"@volar/language-service": "1.10.1",
-		"vscode-uri": "^3.0.7"
+		"@volar/language-service": "1.10.4",
+		"vscode-uri": "^3.0.8"
 	},
 	"devDependencies": {
 		"monaco-editor-core": "latest",
-		"vscode-languageserver-protocol": "^3.17.3"
+		"vscode-languageserver-protocol": "^3.17.5"
 	}
 }

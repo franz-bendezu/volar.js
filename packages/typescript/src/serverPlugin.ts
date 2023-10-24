@@ -179,7 +179,7 @@ export function decorateLanguageServiceHost(
 				if (virtualFile) {
 					let patchedText = text.split('\n').map(line => ' '.repeat(line.length)).join('\n');
 					forEachEmbeddedFile(virtualFile, file => {
-						const ext = file.fileName.replace(fileName, '');
+						const ext = file.fileName.substring(fileName.length);
 						if (file.kind === FileKind.TypeScriptHostFile && (ext === '.d.ts' || ext.match(/^\.(js|ts)x?$/))) {
 							extension = ext;
 							patchedText += file.snapshot.getText(0, file.snapshot.getLength());
@@ -204,7 +204,7 @@ export function decorateLanguageServiceHost(
 	}
 }
 
-export function getExternalFiles(ts: typeof import('typescript/lib/tsserverlibrary'), project: ts.server.Project, exts: string[]) {
+export function searchExternalFiles(ts: typeof import('typescript/lib/tsserverlibrary'), project: ts.server.Project, exts: string[]) {
 	if (project.projectKind !== ts.server.ProjectKind.Configured) {
 		return [];
 	}
@@ -222,3 +222,8 @@ export function getExternalFiles(ts: typeof import('typescript/lib/tsserverlibra
 	const parsed = ts.parseJsonSourceFileConfigFileContent(config, parseHost, project.getCurrentDirectory());
 	return parsed.fileNames;
 }
+
+/**
+ * @deprecated use `searchExternalFiles` instead
+ */
+export const getExternalFiles = searchExternalFiles;
